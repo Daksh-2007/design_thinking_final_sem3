@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PG Finder — Simple & Professional</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --brand: #0f62fe;
+      --glass: rgba(255, 255, 255, 0.6);
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(12, 15, 30, 0.08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #0b1220;
+      line-height: 1.4
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 28px;
+      background: linear-gradient(90deg, white, #fbfdff);
+      border-bottom: 1px solid rgba(15, 20, 30, 0.04);
+      position: sticky;
+      top: 0;
+      z-index: 50
+    }
+
+    .logo {
+      display: flex;
+      gap: 12px;
+      align-items: center
+    }
+
+    .logo .mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand), #6e8bff);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 700
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 22px auto;
+      padding: 0 18px
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px
+    }
+
+    @media (max-width:900px) {
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      .filters {
+        order: 2
+      }
+    }
+
+    /* Filters panel */
+    .filters {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 92px;
+      height: fit-content
+    }
+
+    .filters h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px
+    }
+
+    .group {
+      margin-bottom: 14px
+    }
+
+    label.small {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .chip {
+      background: #f3f6fb;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 13px
+    }
+
+    input[type=range] {
+      width: 100%
+    }
+
+    .facilities {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px
+    }
+
+    .facilities label {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    /* Listings */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px
+    }
+
+    @media (max-width:900px) {
+      .results {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      gap: 12px;
+      transition: transform .18s;
+      cursor: pointer
+    }
+
+    .card:hover {
+      transform: translateY(-6px)
+    }
+
+    .thumb {
+      width: 160px;
+      height: 120px;
+      flex-shrink: 0;
+      object-fit: cover
+    }
+
+    .card-body {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between
+    }
+
+    .pg-title {
+      font-weight: 600;
+      margin: 0
+    }
+
+    .meta {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .tag {
+      background: #f3f6fb;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: 12px
+    }
+
+    .rating {
+      background: #eaf5ff;
+      color: #0047bb;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-weight: 600
+    }
+
+    .price {
+      font-weight: 700
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 10, 20, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 200
+    }
+
+    .modal {
+      background: var(--card);
+      width: min(900px, 98%);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 20px 60px rgba(8, 10, 20, 0.45)
+    }
+
+    .modal .gallery {
+      display: flex;
+      gap: 10px;
+      overflow: auto;
+      padding-bottom: 8px
+    }
+
+    .gallery img {
+      height: 160px;
+      border-radius: 10px;
+      flex: 0 0 auto;
+      object-fit: cover
+    }
+
+    .close-btn {
+      background: #efefef;
+      border: 0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer
+    }
+
+    footer {
+      margin: 40px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    /* small helpers */
+    .muted {
+      color: var(--muted)
+    }
+
+    .flex {
+      display: flex;
+      align-items: center
+    }
+
+    .space {
+      flex: 1
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <div class="mark">PG</div>
+      <div>
+        <div style="font-weight:700">PG Finder</div>
+        <div style="font-size:12px;color:var(--muted)">Find a clean, safe PG near you</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="layout">
+      <!-- Filters -->
+      <aside class="filters" aria-label="Filters">
+        <h3>Filters</h3>
+
+        <div class="group">
+          <label class="small">Price range (₹)</label>
+          <div class="row">
+            <div class="chip" id="priceValue">₹ 0 - ₹ 5000+</div>
+          </div>
+          <input type="range" id="priceRange" min="0" max="20000" step="250" value="5000">
+        </div>
+
+        <div class="group">
+          <label class="small">Facilities</label>
+          <div class="facilities" id="facilitiesList">
+            <!-- checkboxes populated by JS for readability -->
+          </div>
+        </div>
+
+        <div class="group">
+          <label class="small">Food Options</label>
+          <div class="row">
+            <label><input type="checkbox" value="Veg" class="filter-food"> Veg</label>
+            <label><input type="checkbox" value="Non-Veg" class="filter-food"> Non-Veg</label>
+            <label style="margin-left:8px"><input type="checkbox" value="MenuCustomization" class="filter-food"> Menu
+              Customization</label>
+          </div>
+        </div>
+
+        <div class="group">
+          <label class="small">Room Types</label>
+          <div class="row">
+            <label><input type="checkbox" value="Single" class="filter-room"> Single</label>
+            <label><input type="checkbox" value="Double" class="filter-room"> Double</label>
+            <label><input type="checkbox" value="Triple" class="filter-room"> Triple</label>
+            <label><input type="checkbox" value="Quad" class="filter-room"> Quad</label>
+          </div>
+        </div>
+
+        <div class="group">
+          <label class="small">Washroom</label>
+          <div class="row">
+            <label><input type="checkbox" value="Attached" class="filter-wash"> Attached</label>
+            <label><input type="checkbox" value="Common" class="filter-wash"> Common</label>
+          </div>
+        </div>
+
+        <div class="group">
+          <label class="small">AC / Non-AC</label>
+          <div class="row">
+            <label><input type="checkbox" value="AC" class="filter-ac"> AC</label>
+            <label><input type="checkbox" value="Non-AC" class="filter-ac"> Non-AC</label>
+          </div>
+        </div>
+
+        <div class="group">
+          <button id="clearFilters" class="chip" style="border:0;cursor:pointer">Clear filters</button>
+        </div>
+
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">* Tap a PG card to view details</div>
+      </aside>
+
+      <!-- Results -->
+      <section>
+        <div class="toolbar">
+          <div><strong id="resultsCount">0</strong> PGs found</div>
+          <div class="flex">
+            <div class="muted">Sort:</div>
+            <select id="sortBy" style="margin-left:8px;padding:6px;border-radius:8px;border:1px solid #e6e9ef">
+              <option value="relevance">Relevance</option>
+              <option value="priceAsc">Price: Low to High</option>
+              <option value="priceDesc">Price: High to Low</option>
+              <option value="ratingDesc">Rating: High to Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="results" id="results">
+          <!-- cards rendered by JS -->
+        </div>
+      </section>
+    </div>
+
+    <footer> By Daksh, Jay, Naisha, Dhruvi </footer>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div>
+          <h2 id="modalTitle" style="margin:0">PG Name</h2>
+          <div class="muted" id="modalLocation">Location</div>
+        </div>
+        <div class="flex">
+          <div class="rating" id="modalRating">4.5</div>
+          <button class="close-btn" id="closeModal" style="margin-left:12px">Close</button>
+        </div>
+      </div>
+
+      <hr style="margin:12px 0;border:none;border-top:1px solid #eff2f6">
+
+      <div class="gallery" id="modalGallery"></div>
+
+      <h4 style="margin:10px 0 6px 0">Facilities</h4>
+      <ul id="modalFacilities" style="margin-top:0;margin-bottom:12px"></ul>
+
+      <h4 style="margin:10px 0 6px 0">Room Types & Pricing</h4>
+      <div id="modalRooms"></div>
+
+      <h4 style="margin:10px 0 6px 0">Food & Services</h4>
+      <div id="modalFood" class="muted"></div>
+
+    </div>
+  </div>
+
+  <script>
+    // --- Sample PG dataset ---
+    const PGs = [
+      {
+        id: 1,
+        name: "Sunny Stay PG",
+        location: "Ankur, Ahmedabad",
+        price: 3500,
+        rating: 4.5,
+        facilities: ["WiFi", "Laundry", "Refrigerator", "Study Room", "Parking(Bike)", "CCTV", "Biometric", "24x7 Guard", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "Study Table", "AC", "Geyser", "RO"],
+        food: ["Veg", "MenuCustomization"],
+        rooms: { Single: 4500, Double: 3000, Triple: 2200 },
+        washroom: "Attached",
+        ac: true,
+        images: ["https://static.wixstatic.com/media/d5c51d_10eb95e753e64b25b121cba96df03e05~mv2.jpg/v1/fit/w_320,h_427,q_90,enc_avif,quality_auto/d5c51d_10eb95e753e64b25b121cba96df03e05~mv2.jpg", "https://housing-images.n7net.in/01c16c28/5a77e5af280764182350750d9ad947a7/v0/medium/3_rk_-for-rent-shivajinagar-Pune-bedroom.jpg"]
+      },
+      {
+        id: 2,
+        name: "City Comforts",
+        location: "CG Road, Ahmedabad",
+        price: 2800,
+        rating: 4.1,
+        facilities: ["WiFi", "Lift", "Common Lounge", "Gym", "CCTV", "24x7 Guard", "Bed", "Mattress", "Cupboard", "Fan", "RO"],
+        food: ["Veg", "Non-Veg"],
+        rooms: { Double: 2800, Triple: 2000, Quad: 1600 },
+        washroom: "Common",
+        ac: false,
+        images: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk5taGgwKlDjDuFbHeWr22H2zo-K53MXAECA&s", "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/ae/64/6e/boys-pg-in-laxmi-nagar.jpg?w=900&h=500&s=1"]
+      },
+      {
+        id: 3,
+        name: "Green Terrace PG",
+        location: "Naranpura , Ahmedabad",
+        price: 5000,
+        rating: 4.8,
+        facilities: ["WiFi", "Terrace", "Parking(Car)", "Washing Machine", "Refrigerator", "Induction Allowed", "Study Room", "CCTV", "Biometric", "24x7 Guard", "Daily Cleaning", "Bed", "Mattress", "AC", "Geyser", "RO"],
+        food: ["Veg"],
+        rooms: { Single: 6500, Double: 4200 },
+        washroom: "Attached",
+        ac: true,
+        images: [ "https://shreedurgapg.com/wp-content/uploads/2023/12/Single-Room-PG-in-Gurgaon-Haryana.jpg", "https://content.jdmagicbox.com/v2/comp/gurgaon/j9/011pxx11.xx11.160128195953.f9j9/catalogue/elegance-pg-gurgaon-sector-21-gurgaon-paying-guest-accommodations-10e6f5izk9.jpg"]
+      },
+      {
+        id: 4,
+        name: "Budget Home",
+        location: "Old City, Ahmedabad",
+        price: 1500,
+        rating: 3.9,
+        facilities: ["Fan", "Common Lounge", "Parking(Bike)", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "RO"],
+        food: ["Veg", "Non-Veg"],
+        rooms: { Double: 1500, Triple: 1200, Quad: 900 },
+        washroom: "Common",
+        ac: false,
+        images: ["https://static.wixstatic.com/media/489126_8f53f66f84e349eeb19b92aa5da40b34~mv2.jpg/v1/crop/x_378,y_0,w_2244,h_2000/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/DSC06676_edited.jpg","https://static.wixstatic.com/media/489126_53b3663b95b248139b491df4348331e8~mv2.jpg/v1/crop/x_134,y_0,w_1495,h_1332/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Studio_edited.jpg"]
+      },
+      {
+        id: 5,
+        name: "Home PG",
+        location: "Sinfhubhavan, Ahmedabad",
+        price: 7000,
+        rating: 4.4,
+        facilities: ["WiFi", "Laundry", "Refrigerator", "Study Room", "Parking(Bike)", "CCTV", "Biometric", "24x7 Guard", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "Study Table", "AC", "Geyser", "RO"],
+        food: ["Veg", "MenuCustomization"],
+        rooms: { Single: 7000, Double: 3500, Triple: 2200 },
+        washroom: "Attached",
+        ac: true,
+        images: ["1.jpg", "2.jpg"]
+      },
+      {
+        id: 6,
+        name: "Budget Home",
+        location: "Old City, Ahmedabad",
+        price: 1500,
+        rating: 3.9,
+        facilities: ["Fan", "Common Lounge", "Parking(Bike)", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "RO"],
+        food: ["Veg", "Non-Veg"],
+        rooms: { Double: 1500, Triple: 1200, Quad: 900 },
+        washroom: "Common",
+        ac: true,
+        images: ["https://cf.bstatic.com/xdata/images/hotel/max1024x768/330706429.jpg?k=81d7cf2e0d48be622c644a5491e4a9498461d36ae2b58f98ec8722c54d05118b&o=","https://static.wixstatic.com/media/489126_8f53f66f84e349eeb19b92aa5da40b34~mv2.jpg/v1/crop/x_378,y_0,w_2244,h_2000/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/DSC06676_edited.jpg", "https://static.wixstatic.com/media/489126_53b3663b95b248139b491df4348331e8~mv2.jpg/v1/crop/x_134,y_0,w_1495,h_1332/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Studio_edited.jpg"]
+      },
+      {
+        id: 7,
+        name: "Budget Home",
+        location: "Old City, Ahmedabad",
+        price: 1500,
+        rating: 3.9,
+        facilities: ["Fan", "Common Lounge", "Parking(Bike)", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "RO"],
+        food: ["Veg", "Non-Veg"],
+        rooms: { Double: 1500, Triple: 1200, Quad: 900 },
+        washroom: "Common",
+        ac: false,
+        images: ["https://asset-cdn.stanzaliving.com/stanza-living/image/upload/f_auto,q_auto,w_600/e_improve/e_sharpen:10/e_saturation:10/f_auto,q_auto/v1657107830/Website/CMS-Uploads/hhx4llhif8zrc49tjq2b.jpg","https://static.wixstatic.com/media/489126_8f53f66f84e349eeb19b92aa5da40b34~mv2.jpg/v1/crop/x_378,y_0,w_2244,h_2000/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/DSC06676_edited.jpg", "https://static.wixstatic.com/media/489126_53b3663b95b248139b491df4348331e8~mv2.jpg/v1/crop/x_134,y_0,w_1495,h_1332/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Studio_edited.jpg"]
+      },
+      {
+        id: 8,
+        name: "Budget Home",
+        location: "Old City, Ahmedabad",
+        price: 1500,
+        rating: 3.9,
+        facilities: ["Fan", "Common Lounge", "Parking(Bike)", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "RO"],
+        food: ["Veg", "Non-Veg"],
+        rooms: { Double: 1500, Triple: 1200, Quad: 900 },
+        washroom: "Common",
+        ac: false,
+        images: ["https://static.wixstatic.com/media/489126_8f53f66f84e349eeb19b92aa5da40b34~mv2.jpg/v1/crop/x_378,y_0,w_2244,h_2000/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/DSC06676_edited.jpg", "https://static.wixstatic.com/media/489126_53b3663b95b248139b491df4348331e8~mv2.jpg/v1/crop/x_134,y_0,w_1495,h_1332/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Studio_edited.jpg"]
+      },
+      {
+        id: 9,
+        name: "Budget Home",
+        location: "Old City, Ahmedabad",
+        price: 1500,
+        rating: 3.9,
+        facilities: ["Fan", "Common Lounge", "Parking(Bike)", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "RO"],
+        food: ["Veg", "Non-Veg"],
+        rooms: { Double: 1500, Triple: 1200, Quad: 900 },
+        washroom: "Common",
+        ac: false,
+        images: ["https://nestuppg.in/frontend/assets/images/locations/chakala/5.JPG","https://static.wixstatic.com/media/489126_8f53f66f84e349eeb19b92aa5da40b34~mv2.jpg/v1/crop/x_378,y_0,w_2244,h_2000/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/DSC06676_edited.jpg", "https://static.wixstatic.com/media/489126_53b3663b95b248139b491df4348331e8~mv2.jpg/v1/crop/x_134,y_0,w_1495,h_1332/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Studio_edited.jpg"]
+      },
+      {
+        id: 10,
+        name: "Budget Home",
+        location: "Old City, Ahmedabad",
+        price: 1500,
+        rating: 3.9,
+        facilities: ["Fan", "Common Lounge", "Parking(Bike)", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "RO"],
+        food: ["Veg", "Non-Veg"],
+        rooms: { Double: 1500, Triple: 1200, Quad: 900 },
+        washroom: "Common",
+        ac: false,
+        images: ["https://www.homversity.com/site_assets/img/Property-Photos/169-Urban%20Home%20PG%20Accomodation_.jpg","https://static.wixstatic.com/media/489126_8f53f66f84e349eeb19b92aa5da40b34~mv2.jpg/v1/crop/x_378,y_0,w_2244,h_2000/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/DSC06676_edited.jpg","https://static.wixstatic.com/media/489126_53b3663b95b248139b491df4348331e8~mv2.jpg/v1/crop/x_134,y_0,w_1495,h_1332/fill/w_280,h_248,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Studio_edited.jpg"]
+      },
+
+    ];
+
+    // --- Create facilities checkboxes dynamically ---
+    const allFacilities = [
+      "WiFi", "Laundry", "Washing Machine", "Refrigerator", "Induction Allowed", "Study Room", "Parking(Bike)", "Parking(Car)", "Lift", "Common Lounge", "Gym", "Terrace", "CCTV", "Biometric", "24x7 Guard", "Meal Time", "Daily Cleaning", "Bed", "Mattress", "Pillow", "Cupboard", "Study Table", "AC", "Fan", "Geyser", "RO"
+    ];
+    const facilitiesList = document.getElementById('facilitiesList');
+    allFacilities.forEach(f => {
+      const id = 'f_' + f.replace(/[^a-z0-9]/gi, '');
+      const wrapper = document.createElement('label');
+      wrapper.innerHTML = `<input type="checkbox" value="${f}" class="filter-fac"> ${f}`;
+      facilitiesList.appendChild(wrapper);
+    });
+
+    // --- Render cards ---
+    const results = document.getElementById('results');
+    const resultsCount = document.getElementById('resultsCount');
+
+    function renderCard(pg) {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.tabIndex = 0;
+      div.dataset.id = pg.id;
+      div.innerHTML = `
+        <img class="thumb" src="${pg.images[0]}" alt="${pg.name}">
+        <div class="card-body">
+          <div>
+            <h3 class="pg-title">${pg.name}</h3>
+            <div class="meta">${pg.location} • <span class="price">₹${pg.price}</span></div>
+            <div style="margin-top:8px" class="tags">${pg.facilities.slice(0, 5).map(x => `<div class='tag'>${x}</div>`).join('')}</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <div class="muted">Rating</div>
+            <div class="rating">${pg.rating}</div>
+          </div>
+        </div>
+      `;
+      div.addEventListener('click', () => openModal(pg.id));
+      return div;
+    }
+
+    function displayList(list) {
+      results.innerHTML = '';
+      if (list.length === 0) { results.innerHTML = '<div style="grid-column:1/-1;padding:24px;background:white;border-radius:12px;text-align:center">No PGs match selected filters.</div>' }
+      list.forEach(pg => results.appendChild(renderCard(pg)));
+      resultsCount.textContent = list.length;
+    }
+
+    // --- Filtering logic ---
+    const priceRange = document.getElementById('priceRange');
+    const priceValue = document.getElementById('priceValue');
+    const clearBtn = document.getElementById('clearFilters');
+    const sortBy = document.getElementById('sortBy');
+
+    function readFilters() {
+      const maxPrice = Number(priceRange.value) || 5000;
+      const fac = Array.from(document.querySelectorAll('.filter-fac:checked')).map(i => i.value);
+      const food = Array.from(document.querySelectorAll('.filter-food:checked')).map(i => i.value);
+      const rooms = Array.from(document.querySelectorAll('.filter-room:checked')).map(i => i.value);
+      const wash = Array.from(document.querySelectorAll('.filter-wash:checked')).map(i => i.value);
+      const ac = Array.from(document.querySelectorAll('.filter-ac:checked')).map(i => i.value);
+      return { maxPrice, fac, food, rooms, wash, ac };
+    }
+
+    function matchesFilters(pg, filters) {
+      // price
+      if (pg.price > filters.maxPrice) return false;
+      // facilities: require that every selected facility is included
+      for (const f of filters.fac) {
+        if (!pg.facilities.includes(f) && !pg.facilities.includes(f.replace('(', '').replace(')', ''))) return false;
+      }
+      // food
+      if (filters.food.length) {
+        // at least one of selected food options should be present
+        let ok = false;
+        for (const f of filters.food) { if (pg.food.includes(f)) ok = true }
+        if (!ok) return false;
+      }
+      // rooms
+      if (filters.rooms.length) {
+        let ok = false;
+        for (const r of filters.rooms) { if (pg.rooms && pg.rooms[r]) ok = true }
+        if (!ok) return false;
+      }
+      // wash
+      if (filters.wash.length) { if (!filters.wash.includes(pg.washroom)) return false }
+      // ac
+      if (filters.ac.length) {
+        if (filters.ac.includes('AC') && !pg.ac) return false;
+        if (filters.ac.includes('Non-AC') && pg.ac) return false;
+      }
+      return true;
+    }
+
+    function applyFilters() {
+      const f = readFilters();
+      priceValue.textContent = `₹ 0 - ₹ ${f.maxPrice ? f.maxPrice + (f.maxPrice == 5000 ? '+' : '') : '5000+'}`;
+      let list = PGs.filter(pg => matchesFilters(pg, f));
+      // sorting
+      const s = sortBy.value;
+      if (s === 'priceAsc') list.sort((a, b) => a.price - b.price);
+      if (s === 'priceDesc') list.sort((a, b) => b.price - a.price);
+      if (s === 'ratingDesc') list.sort((a, b) => b.rating - b.rating ? b.rating - a.rating : 0);
+      displayList(list);
+    }
+
+    // --- Modal behavior ---
+    const backdrop = document.getElementById('modalBackdrop');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalLocation = document.getElementById('modalLocation');
+    const modalRating = document.getElementById('modalRating');
+    const modalGallery = document.getElementById('modalGallery');
+    const modalFacilities = document.getElementById('modalFacilities');
+    const modalRooms = document.getElementById('modalRooms');
+    const modalFood = document.getElementById('modalFood');
+    const closeModal = document.getElementById('closeModal');
+
+    function openModal(id) {
+      const pg = PGs.find(p => p.id == id);
+      if (!pg) return;
+      modalTitle.textContent = pg.name;
+      modalLocation.textContent = pg.location;
+      modalRating.textContent = pg.rating;
+      modalGallery.innerHTML = pg.images.map(src => `<img src="${src}" alt="${pg.name}">`).join('');
+      modalFacilities.innerHTML = pg.facilities.map(f => `<li>${f}</li>`).join('');
+      modalRooms.innerHTML = Object.keys(pg.rooms || {}).map(r => `<div style="margin-bottom:6px"><strong>${r}</strong>: ₹${pg.rooms[r]}</div>`).join('') || '<div class="muted">Not specified</div>';
+      modalFood.textContent = pg.food.length ? pg.food.join(' • ') : 'No food options listed';
+      backdrop.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function close() { backdrop.style.display = 'none'; document.body.style.overflow = 'auto' }
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close() });
+    closeModal.addEventListener('click', close);
+
+    // --- Events ---
+    priceRange.addEventListener('input', applyFilters);
+    document.querySelectorAll('.filter-fac,.filter-food,.filter-room,.filter-wash,.filter-ac').forEach(el => el.addEventListener('change', applyFilters));
+    sortBy.addEventListener('change', applyFilters);
+    clearBtn.addEventListener('click', () => {
+      document.querySelectorAll('.filters input[type=checkbox]').forEach(c => c.checked = false);
+      priceRange.value = 5000;
+      sortBy.value = 'relevance';
+      applyFilters();
+    });
+
+    // initial render
+    applyFilters();
+
+    // Accessibility: keyboard open
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { if (backdrop.style.display === 'flex') close(); }
+    });
+  </script>
+</body>
+
+</html>
